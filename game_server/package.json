@@ -1,0 +1,16 @@
+{
+  "name": "main_server",
+  "version": "0.0.0",
+  "description": "main_server",
+  "main": "app.js",
+
+  "dependencies": {
+    "uuid": "3.1.0",
+    "socket.io": "2.0.3",
+    "mysql": "2.14.1",
+    "express": "4.15.3"
+  },
+ 
+  "author": "David Panagiotis",
+  "license": "ISC"
+}

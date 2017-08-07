@@ -1,0 +1,9 @@
+{
+  "name": "game_instance_server",
+  "version": "0.0.0",
+  "description": "game_instance_server",
+  "main": "app.js",
+  "author": {
+    "name": "David Panagiotis"
+  }
+}

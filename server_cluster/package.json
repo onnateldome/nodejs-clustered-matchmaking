@@ -1,0 +1,9 @@
+{
+  "name": "server_cluster",
+  "version": "0.0.0",
+  "description": "server_cluster",
+  "main": "app.js",
+  "author": {
+    "name": "David Panagiotis"
+  }
+}
