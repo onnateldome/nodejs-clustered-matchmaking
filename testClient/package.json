@@ -1,0 +1,9 @@
+{
+  "name": "test-client",
+  "version": "0.0.0",
+  "description": "testClient",
+  "main": "app.js",
+  "author": {
+    "name": "n00b"
+  }
+}

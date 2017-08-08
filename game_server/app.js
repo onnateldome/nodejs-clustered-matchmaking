@@ -1,25 +1,33 @@
 var PORT = 19200;
 var HOST = '127.0.0.1';
 
+
 var dgram = require('dgram');
 var server = dgram.createSocket('udp4');
-
+const cluster = require('cluster');
 
 var db = require('./db.js');
 const UUID = require('uuid/v4');
 
 //db.select(2); //test db queri
 //console.log('user login id ='+ db.login("onna", "test"));
-var playertestID = UUID();
-console.log(playertestID);
+//var playertestID = UUID();
+//console.log(playertestID);
 
+const numCPUs = require('os').cpus().length;
 
 var players = [];
 var miniServers = [];
 var gameServers = [];
-
+console.log("cpu core count:" + numCPUs);
 console.log("main server started on port " + PORT);
 
+function send(message,ip,port) {
+	server.send(message, 0, message.length, port, ip, function (err, bytes) {
+		if (err) throw err;
+	});
+
+}
 
 server.on('listening', function () {
 	var address = server.address();
@@ -28,19 +36,58 @@ server.on('listening', function () {
 
 server.on('message', function (message, remote) {
 	console.log(remote.address + ':' + remote.port + ' - ' + message);
-		
-		
-	if (message == "login") {
+	var msg = message.toString().split(" ");
 
-		db.login("onna", "test",function (err, data) {
-			if (err) {
-				// error handling code goes here
-				console.log("ERROR : ", err);   
-			} else {
-				// code to execute on data retrieval
-				console.log("result from db is : ", data);
-			}    
-		});
+	if (msg[1] == 'who') {
+		console.log(players);
+	}
+
+	if (msg[1] == "logout") {
+		for (var i = 0; i < players.length; i++) {
+			if (players[i].session_id == msg[0]) {
+				players.splice(i, 1);
+				send(new Buffer('0'), remote.address, remote.port); 
+			}
+		}
+	}
+
+	if (msg[1] == 'ping') {
+		isOnline = 0;
+		if (msg[0] != null) {
+			for (var i = 0; i < players.length; i++) {
+				if (players[i].session_id == msg[0]) {					
+					isOnline = 1;
+				}
+			}
+		}
+		send(new Buffer(isOnline.toString()), remote.address, remote.port); 
+	}
+
+	if (msg[0] == "login") {
+		if (msg.length == 3) {
+			db.login(msg[1], msg[2], function (err, data) {
+				if (err) {
+					// error handling code goes here
+					console.log("ERROR : ", err);
+				} else {
+					// code to execute on data retrieval
+					if (data != null) {
+						var s_id = UUID();
+						players.push({
+							pID: data, session_id: s_id, ip: remote.address,port:remote.port})
+						send(new Buffer('sid '+s_id), remote.address, remote.port);
+						// list of the current loged in players
+						console.log(players);
+					} else {
+						send(new Buffer('login failed!'), remote.address, remote.port);
+					}
+					console.log("result from db is : ", data);
+				}
+			});
+
+		} else {
+			send(new Buffer('login failed!'), remote.address, remote.port);
+		}
 	}
 
 });
