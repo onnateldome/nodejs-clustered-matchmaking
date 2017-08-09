@@ -4,6 +4,9 @@ var comm = '';
 var user_id = '';
 var user_name = '';
 var session_id = '';
+var online_players = 0;
+var wins = 0;
+var loses = 0;
 
 const readline = require('readline');
 var dgram = require('dgram');
@@ -11,8 +14,7 @@ var client = dgram.createSocket('udp4');
 
 
 client.on('listening', function () {
-	console.log('UDP Server listening on ' + HOST + ":" + PORT);
-
+	console.log('UDP listening for server on ' + HOST + ":" + PORT);
 });
 
 client.on('message', function (message, remote) {
@@ -23,6 +25,9 @@ client.on('message', function (message, remote) {
 		session_id = '';
 		user_id = '';
 		user_name = '';
+		online_players = 0;
+		wins = 0
+		loses = 0;
 	}
 
 	if (msg[0] == '1') {
@@ -31,7 +36,16 @@ client.on('message', function (message, remote) {
 
 	if (msg[0] == 'sid') {
 		session_id = msg[1];
+		online_players = msg[2];
+		wins = msg[3];
+		loses = msg[4];
 	}
+	if (msg[0] == 'stt') {
+		online_players = msg[1];
+		wins = msg[2];
+		loses = msg[3];
+	}
+
 });
 
 function send(message) {
@@ -49,7 +63,7 @@ const rl = readline.createInterface({
 
 function getcommand() {
 
-	rl.question(user_id+' '+user_name+' '+session_id+'>', (r_command) => {
+	rl.question('Game stats:\n Players online:' + online_players + ' wins:' + wins+' loses:'+loses + '\n' + user_id + ' ' + user_name + ' ' + session_id + '>', (r_command) => {
 
 		var cm_send = '';
 		cm_send = r_command.split(" ");

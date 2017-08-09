@@ -22,10 +22,33 @@ var gameServers = [];
 console.log("cpu core count:" + numCPUs);
 console.log("main server started on port " + PORT);
 
-function send(message,ip,port) {
+function send(message, ip, port) {
 	server.send(message, 0, message.length, port, ip, function (err, bytes) {
 		if (err) throw err;
 	});
+
+}
+
+function getStats(id, ip, port) {
+
+	db.getStats(id, function (err, data) {
+		if (err) {
+			// error handling code goes here
+			console.log("ERROR : ", err);
+		} else {
+			// code to execute on data retrieval
+			if (data != null) {
+				console.log(data.victories + ' ' + data.defeats);
+				send(new Buffer('stt ' + players.length + ' ' + data.victories + ' ' + data.defeats), ip, port);
+				// list of the current loged in players
+				//console.log(players);
+			} else {
+				send(new Buffer('login failed!'), remote.address, remote.port);
+			}
+			console.log("result from db is : ", data);
+		}
+	});
+
 
 }
 
@@ -34,34 +57,11 @@ server.on('listening', function () {
 	console.log('UDP Server listening on ' + address.address + ":" + address.port);
 });
 
+
+
 server.on('message', function (message, remote) {
 	console.log(remote.address + ':' + remote.port + ' - ' + message);
 	var msg = message.toString().split(" ");
-
-	if (msg[1] == 'who') {
-		console.log(players);
-	}
-
-	if (msg[1] == "logout") {
-		for (var i = 0; i < players.length; i++) {
-			if (players[i].session_id == msg[0]) {
-				players.splice(i, 1);
-				send(new Buffer('0'), remote.address, remote.port); 
-			}
-		}
-	}
-
-	if (msg[1] == 'ping') {
-		isOnline = 0;
-		if (msg[0] != null) {
-			for (var i = 0; i < players.length; i++) {
-				if (players[i].session_id == msg[0]) {					
-					isOnline = 1;
-				}
-			}
-		}
-		send(new Buffer(isOnline.toString()), remote.address, remote.port); 
-	}
 
 	if (msg[0] == "login") {
 		if (msg.length == 3) {
@@ -72,12 +72,24 @@ server.on('message', function (message, remote) {
 				} else {
 					// code to execute on data retrieval
 					if (data != null) {
+						for (var i = 0; i < players.length; i++) {
+							if (players[i].pID == data) {
+								send(new Buffer('0'), players[i].ip, players[i].port);
+								players.splice(i, 1);
+							}
+						}
+						
 						var s_id = UUID();
+
 						players.push({
-							pID: data, session_id: s_id, ip: remote.address,port:remote.port})
-						send(new Buffer('sid '+s_id), remote.address, remote.port);
+							pID: data, session_id: s_id, ip: remote.address, port: remote.port
+						})
+						//query db for player stats. data is player ID here						
+						send(new Buffer('sid ' + s_id), remote.address, remote.port);
+
+						getStats(data, remote.address, remote.port);
 						// list of the current loged in players
-						console.log(players);
+						//console.log(players);
 					} else {
 						send(new Buffer('login failed!'), remote.address, remote.port);
 					}
@@ -89,6 +101,52 @@ server.on('message', function (message, remote) {
 			send(new Buffer('login failed!'), remote.address, remote.port);
 		}
 	}
+	if (msg[0].length == 36) {
+		for (var i = 0; i < players.length; i++) {
+			if (players[i].session_id == msg[0]) {
+				
+				if (msg[1] == 'who') {
+					console.log(players);
+				}
+
+				if (msg[1] == 'test') {
+					db.select(2);
+				}
+
+				if (msg[1] == "logout") {
+					for (var i = 0; i < players.length; i++) {
+						if (players[i].session_id == msg[0]) {
+							players.splice(i, 1);
+							send(new Buffer('0'), remote.address, remote.port);
+						}
+					}
+				}
+
+
+
+				if (msg[1] == 'ping') {
+					isOnline = 0;
+					if (msg[0] != null) {
+						for (var i = 0; i < players.length; i++) {
+							if (players[i].session_id == msg[0]) {
+								isOnline = 1;
+							}
+						}
+					}
+					send(new Buffer(isOnline.toString()), remote.address, remote.port);
+				}
+			} 
+
+		}
+	}
+
+
+	if (msg[0] == 'test') {
+		db.select(2);
+	}
+
+
+
 
 });
 
@@ -97,15 +155,15 @@ server.bind(PORT, HOST);
 /*
 server.on('connection', function (socket) {
 
-	var playerID = UUID();
+var playerID = UUID();
 
 
 
-	socket.on('disconnect', function () {
-		console.log('client disconected');
-		delete players[thisPlayerId];
-		socket.broadcast.emit('disconnected', { id: thisPlayerId });
-	});
+socket.on('disconnect', function () {
+console.log('client disconected');
+delete players[thisPlayerId];
+socket.broadcast.emit('disconnected', { id: thisPlayerId });
+});
 
 
 });

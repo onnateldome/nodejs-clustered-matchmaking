@@ -31,6 +31,9 @@
   <ItemGroup>
     <Compile Include="app.js" />
     <Compile Include="db.js" />
+    <Compile Include="server_functions.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>

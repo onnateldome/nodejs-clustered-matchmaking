@@ -10,6 +10,32 @@ var pool = mysql.createPool({
 	/*debug: true */
 });
 
+exports.getStats = function (id, callback) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			connection.release();
+			callback(err, null);
+		}
+
+		//run the query
+		connection.query('select victories,defeats from user_stats where ID=' +id  , function (err, rows) {
+			if (err) throw err;
+			else {
+				if (rows.length > 0) {
+					console.log(rows);//sql debug 
+					callback(null, { victories: parseInt(rows[0].victories), defeats:parseInt(rows[0].defeats)});
+				} else {
+					callback(null, null);
+				}
+			}
+		});
+
+		connection.release();//release the connection
+	});
+
+
+};
+
 // log in check
 exports.login = function (user, pass, callback) {
 		pool.getConnection(function (err, connection) {
@@ -21,10 +47,11 @@ exports.login = function (user, pass, callback) {
 		connection.query('select ID from users where user_login="' + user+'" and user_pass="'+pass+'"', function (err, rows) {
 			if (err) throw err;
 			else {
-				if (rows.length>0) {
+				if (rows.length > 0) {
+					console.log(rows);//sql debug 
 					callback(null, rows[0].ID);
 				} else {
-					callback(null, null);}//	console.log(rows);
+					callback(null, null);}
 			}
 		});
 
