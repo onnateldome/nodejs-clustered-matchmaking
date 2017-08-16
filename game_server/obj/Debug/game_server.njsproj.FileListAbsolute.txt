@@ -1,2 +1,0 @@
-c:\users\n00b\documents\visual studio 2017\Projects\game_server\game_server\obj\Debug\game_server.njsprojResolveAssemblyReference.cache
-c:\users\n00b\documents\visual studio 2017\Projects\game_server\game_server\bin\Microsoft.NodejsTools.WebRole.dll
