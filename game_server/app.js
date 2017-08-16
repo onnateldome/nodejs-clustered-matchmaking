@@ -28,7 +28,25 @@ function send(message, ip, port) {
 	});
 
 }
-
+/*
+ db.isServerUp(function (err) {
+    if (err) {
+        // error handling code goes here
+        console.log("ERROR : ", err);
+    } else {
+        // code to execute on data retrieval
+        if (data != null) {
+             
+         
+            console.log(data);
+        } else {
+            send(new Buffer('login failed!'), remote.address, remote.port);
+        }
+        console.log("result from db is : ", data);
+    }
+    
+    });
+    */
 function getStats(id, ip, port) {
 
 	db.getStats(id, function (err, data) {

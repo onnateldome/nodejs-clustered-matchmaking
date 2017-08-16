@@ -36,6 +36,34 @@ exports.getStats = function (id, callback) {
 
 };
 
+/*
+exports.isServerUp = function (callback){
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            connection.release();
+            callback(err, null);
+        }
+        
+        //run the query
+        connection.query('select count(*) from users', function (err, rows) {
+            if (err) throw err;
+            else {
+                if (rows.length > 0) {
+                    console.log(rows);//sql debug 
+                    callback(null, rows);
+                } else {
+                    callback(null, null);
+                }
+            }
+        });
+        connection.release();//release the connection
+    });
+    };
+
+    */
+
+
+
 // log in check
 exports.login = function (user, pass, callback) {
 		pool.getConnection(function (err, connection) {
@@ -44,7 +72,7 @@ exports.login = function (user, pass, callback) {
 			callback(err, null);
 		}
 		//run the query
-		connection.query('select ID from users where user_login="' + user+'" and user_pass="'+pass+'"', function (err, rows) {
+		connection.query('select ID from users where user_login="' + connection.escape(user)+'" and user_pass="'+ connection.escape(pass)+'"', function (err, rows) {
 			if (err) throw err;
 			else {
 				if (rows.length > 0) {
