@@ -72,7 +72,7 @@ exports.login = function (user, pass, callback) {
 			callback(err, null);
 		}
 		//run the query
-		connection.query('select ID from users where user_login="' + connection.escape(user)+'" and user_pass="'+ connection.escape(pass)+'"', function (err, rows) {
+		connection.query('select ID from users where user_login=' + connection.escape(user)+' and user_pass='+ connection.escape(pass), function (err, rows) {
 			if (err) throw err;
 			else {
 				if (rows.length > 0) {

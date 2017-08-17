@@ -7,6 +7,8 @@ var session_id = '';
 var online_players = 0;
 var wins = 0;
 var loses = 0;
+var gameServerIp = '0';
+var gameServerPort = '0';
 
 const readline = require('readline');
 var dgram = require('dgram');
@@ -44,6 +46,11 @@ client.on('message', function (message, remote) {
 		online_players = msg[1];
 		wins = msg[2];
 		loses = msg[3];
+	}
+
+	if (msg[0] == 'connectTo') {
+		gameServerIp = msg[1];
+		gameServerPort = msg[2];
 	}
 
 });

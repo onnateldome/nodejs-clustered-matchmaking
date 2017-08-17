@@ -16,6 +16,7 @@ const UUID = require('uuid/v4');
 
 const numCPUs = require('os').cpus().length;
 
+var lookingForGame = [];
 var players = [];
 var miniServers = [];
 var gameServers = [];
@@ -81,6 +82,12 @@ server.on('message', function (message, remote) {
 	console.log(remote.address + ':' + remote.port + ' - ' + message);
 	var msg = message.toString().split(" ");
 
+	if (msg[0] == "slogin") {
+		if (msg.length == 3) {
+
+		}
+	}
+
 	if (msg[0] == "login") {
 		if (msg.length == 3) {
 			db.login(msg[1], msg[2], function (err, data) {
@@ -140,7 +147,20 @@ server.on('message', function (message, remote) {
 					}
 				}
 
+				if (msg[1] == 'findGame') {
 
+				}
+
+				if (msg[1] == 'stopSearching') {
+
+				}
+
+				if (msg[1] == 'stopSearching') {
+
+				}
+
+
+				
 
 				if (msg[1] == 'ping') {
 					isOnline = 0;
