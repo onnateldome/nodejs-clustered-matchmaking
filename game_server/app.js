@@ -18,7 +18,7 @@ const numCPUs = require('os').cpus().length;
 
 var lookingForGame = [];
 var players = [];
-var miniServers = [];
+var clusterServers = [];
 var gameServers = [];
 console.log("cpu core count:" + numCPUs);
 console.log("main server started on port " + PORT);
@@ -83,8 +83,14 @@ server.on('message', function (message, remote) {
 	var msg = message.toString().split(" ");
 
 	if (msg[0] == "slogin") {
-		if (msg.length == 3) {
+		if (msg.length == 2) {
+			var s_id = UUID();
+			s_id
+			clusterServers.push({
+				sName: msg[1], session_id: s_id, ip: remote.address, port: remote.port
+			})
 
+			send(new Buffer('sid ' + s_id), remote.address, remote.port);
 		}
 	}
 

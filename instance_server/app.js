@@ -1,6 +1,6 @@
-var PORT = 19200;
+var PORT = 19300;
 var HOST = '127.0.0.1';
-
+var mainServerIP = '127.0.0.1';
 
 var dgram = require('dgram');
 var server = dgram.createSocket('udp4');
@@ -10,7 +10,7 @@ function send(message, ip, port) {
 		if (err) throw err;
 	});
 
-
+}
 
 	server.on('listening', function () {
 		var address = server.address();
